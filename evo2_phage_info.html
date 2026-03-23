@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evo 2 · Phage Genome Design Cheatsheet</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c0f0a;
+    --surface: #141710;
+    --surface2: #1c2018;
+    --border: #2a2e24;
+    --border2: #363c2e;
+    --green: #8fb85a;
+    --green-dim: #4a6128;
+    --green-bright: #b5e06a;
+    --amber: #d4a847;
+    --amber-dim: #6b5220;
+    --teal: #4ab8a0;
+    --teal-dim: #1d4a3e;
+    --red: #d45a5a;
+    --text: #d8dccc;
+    --text2: #8a9078;
+    --text3: #555c44;
+    --mono: 'IBM Plex Mono', monospace;
+    --serif: 'Instrument Serif', serif;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-family: var(--serif);
+    font-size: 38px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--green-bright);
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+
+  .header-left .subtitle {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    text-align: right;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.06em;
+    margin-left: 6px;
+  }
+
+  .badge-green { background: var(--green-dim); color: var(--green-bright); }
+  .badge-amber { background: var(--amber-dim); color: var(--amber); }
+
+  .endpoint-box {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text2);
+    margin-top: 10px;
+    white-space: nowrap;
+  }
+
+  .endpoint-box span { color: var(--green); }
+
+  /* Grid layout */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .grid-fullwidth {
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 680px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+
+  .card-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 12px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .ct-green::before { background: var(--green); }
+  .ct-amber::before { background: var(--amber); }
+  .ct-teal::before { background: var(--teal); }
+  .ct-red::before { background: var(--red); }
+
+  /* Steps */
+  .steps { list-style: none; }
+  .steps li {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--bg);
+    background: var(--green);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-text { color: var(--text); font-size: 13px; }
+  .step-text a { color: var(--teal); text-decoration: none; }
+  .step-text a:hover { text-decoration: underline; }
+
+  /* Code block */
+  .code-block {
+    background: #080a06;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  .code-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+  }
+
+  /* Syntax highlighting */
+  .c-key { color: #4ab8a0; }
+  .c-str { color: #d4a847; }
+  .c-num { color: #8fb85a; }
+  .c-cmt { color: #454d38; font-style: italic; }
+  .c-kw  { color: #9b7ce8; }
+  .c-fn  { color: #e88c5a; }
+  .c-url { color: #5ab8e8; }
+  .c-tax { color: #b85ae8; }
+
+  /* Param table */
+  .param-table { width: 100%; border-collapse: collapse; }
+  .param-table th {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 500;
+    text-align: left;
+    padding: 0 0 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .param-table td {
+    padding: 7px 0;
+    vertical-align: top;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .param-table tr:last-child td { border-bottom: none; }
+
+  .param-name {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    padding-right: 12px;
+    white-space: nowrap;
+  }
+
+  .param-type {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--amber);
+    padding-right: 12px;
+    white-space: nowrap;
+  }
+
+  .param-desc { color: var(--text2); font-size: 12px; }
+  .param-rec  { color: var(--teal); font-family: var(--mono); font-size: 11px; }
+
+  /* Use-case tabs */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 7px 12px;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    color: var(--text3);
+    border: 1px solid transparent;
+    border-bottom: none;
+    letter-spacing: 0.05em;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .tab:hover { color: var(--text2); }
+  .tab.active {
+    color: var(--green-bright);
+    background: var(--surface2);
+    border-color: var(--border);
+    border-bottom-color: var(--surface2);
+    margin-bottom: -1px;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .tab-code-wrapper {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 16px;
+  }
+
+  /* Tips */
+  .tip {
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .tip:last-child { margin-bottom: 0; }
+  .tip-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .tip-text { color: var(--text2); }
+  .tip-text strong { color: var(--text); font-weight: 500; }
+
+  .tip-warn { background: rgba(212,168,71,0.08); border-left: 2px solid var(--amber); }
+  .tip-info { background: rgba(74,184,160,0.06); border-left: 2px solid var(--teal); }
+  .tip-good { background: rgba(143,184,90,0.06); border-left: 2px solid var(--green); }
+
+  /* Workflow diagram */
+  .workflow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .wf-step {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    padding: 12px 8px;
+  }
+
+  .wf-icon {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .wf-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+
+  .wf-desc {
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.4;
+  }
+
+  .wf-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--border2);
+    font-size: 18px;
+    padding: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* QC checklist */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+  .check { color: var(--text3); flex-shrink: 0; font-family: var(--mono); }
+  .check-label strong { color: var(--text); }
+  .check-label code {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--green);
+  }
+
+  /* Section divider label */
+  .section-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--text3);
+    margin: 24px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text3);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  footer a { color: var(--teal); text-decoration: none; }
+
+  /* Inline code */
+  code {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--surface2);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--green);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="header-left">
+      <h1>Evo 2 · Phage Genome Design</h1>
+      <div class="subtitle">NVIDIA NIM Hosted API &nbsp;·&nbsp; Quickstart Cheatsheet &nbsp;·&nbsp; Bacteriophage (30–50 kb)</div>
+      <div style="margin-top:10px">
+        <span class="badge badge-green">evo2-40b</span>
+        <span class="badge badge-amber">1M bp context</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-bottom:4px">API ENDPOINT</div>
+      <div class="endpoint-box">
+        POST &nbsp;<span>https://health.api.nvidia.com</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/v1/biology/arc/evo2-40b/generate
+      </div>
+    </div>
+  </header>
+
+  <!-- Section: Setup -->
+  <div class="section-label">01 &nbsp; setup</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-green">Get your API key</div>
+      <ol class="steps">
+        <li>
+          <div class="step-num">1</div>
+          <div class="step-text">Go to <a href="https://build.nvidia.com/arc/evo2-40b" target="_blank">build.nvidia.com/arc/evo2-40b</a> and click <strong>Get API Key</strong></div>
+        </li>
+        <li>
+          <div class="step-num">2</div>
+          <div class="step-text">Create or log into your NVIDIA NGC account</div>
+        </li>
+        <li>
+          <div class="step-num">3</div>
+          <div class="step-text">Copy your key and store it as an environment variable</div>
+        </li>
+        <li>
+          <div class="step-num">4</div>
+          <div class="step-text">Free tier gives enough credits to prototype your pipeline</div>
+        </li>
+      </ol>
+      <div style="margin-top:12px">
+        <div class="code-label">shell</div>
+        <div class="code-block"><span class="c-kw">export</span> <span class="c-key">NVIDIA_API_KEY</span>=<span class="c-str">"nvapi-xxxx..."</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-amber">Install dependencies (Python)</div>
+      <div class="code-label">bash</div>
+      <div class="code-block"><span class="c-fn">pip</span> install requests biopython</div>
+      <div style="margin-top:14px">
+        <div class="tip tip-info">
+          <div class="tip-icon">ℹ</div>
+          <div class="tip-text">No local GPU required. Evo 2-40B runs on NVIDIA DGX Cloud. You send a seed sequence and receive generated DNA via HTTPS.</div>
+        </div>
+        <div class="tip tip-warn">
+          <div class="tip-icon">⚠</div>
+          <div class="tip-text"><strong>Large responses:</strong> sequences &gt;200 tokens return as <code>application/zip</code>. Your client must handle both JSON and ZIP responses.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Parameters -->
+  <div class="section-label">02 &nbsp; API parameters</div>
+
+  <div class="card grid-fullwidth">
+    <div class="card-title ct-teal">Request body fields</div>
+    <table class="param-table">
+      <thead>
+        <tr>
+          <th>Parameter</th>
+          <th>Type</th>
+          <th>Description &amp; phage-specific guidance</th>
+          <th>Recommended</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="param-name">sequence</td>
+          <td class="param-type">string</td>
+          <td class="param-desc">Seed DNA (ACGT only). For phage work: use the first 200–500 bp of a reference genome or a conserved structural gene (e.g. terminase large subunit). Optionally prepend a taxonomy tag.</td>
+          <td class="param-rec">500–1000 bp seed</td>
+        </tr>
+        <tr>
+          <td class="param-name">num_tokens</td>
+          <td class="param-type">integer</td>
+          <td class="param-desc">Tokens to generate. 1 token ≈ 1 nucleotide. For a 30 kb phage genome from a 500 bp seed, set this to ~29,500. Max varies by plan.</td>
+          <td class="param-rec">5000–30000</td>
+        </tr>
+        <tr>
+          <td class="param-name">temperature</td>
+          <td class="param-type">float</td>
+          <td class="param-desc">Controls sequence diversity. Lower = more faithful to seed; higher = more novel variants. For synthetic phage design, moderate values balance novelty with plausibility.</td>
+          <td class="param-rec">0.7–1.0</td>
+        </tr>
+        <tr>
+          <td class="param-name">top_k</td>
+          <td class="param-type">integer</td>
+          <td class="param-desc">Limits sampling to the top K most likely nucleotides at each position. Lower values produce more deterministic sequences; top_k=1 is greedy decoding.</td>
+          <td class="param-rec">4 (diversity) or 1 (deterministic)</td>
+        </tr>
+        <tr>
+          <td class="param-name">top_p</td>
+          <td class="param-type">float</td>
+          <td class="param-desc">Nucleus sampling threshold. Use either top_k or top_p, not both simultaneously.</td>
+          <td class="param-rec">0.9 (if using top_p)</td>
+        </tr>
+        <tr>
+          <td class="param-name">enable_sampled_probs</td>
+          <td class="param-type">bool</td>
+          <td class="param-desc">Returns per-position log-probabilities alongside the sequence. Useful for scoring plausibility of each generated nucleotide.</td>
+          <td class="param-rec">true (for scoring runs)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section: Taxonomy prompt -->
+  <div class="section-label">03 &nbsp; taxonomy prompt (key feature for phage work)</div>
+
+  <div class="card grid-fullwidth">
+    <div class="card-title ct-green">Bias generation toward a target phage clade</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:14px">
+      Prepend a taxonomy tag to your seed sequence to steer Evo 2 toward generating sequences consistent with that lineage. Use NCBI taxonomy names. Leave fields blank or omit if unknown.
+    </p>
+    <div class="code-label">taxonomy tag format</div>
+    <div class="code-block"><span class="c-tax">|k__Viruses;p__Uroviricota;c__Caudoviricetes;o__Caudovirales;g__[Genus];s__[Species]|</span></div>
+
+    <div style="margin-top:14px">
+      <div class="code-label">examples — C. acnes phage (PAC-type) seed</div>
+      <div class="code-block"><span class="c-cmt"># Targeting Propionibacteriales phage clade</span>
+<span class="c-key">sequence</span> = (
+    <span class="c-str">"|k__Viruses;p__Uroviricota;c__Caudoviricetes;"</span>
+    <span class="c-str">"o__Caudovirales;g__Pahexavirus;s__Propionibacterium_phage_PA6|"</span>
+    <span class="c-str">"ATGAAAGCAATTTTCGTACTGAAAGGTTTTGTT..."</span>   <span class="c-cmt"># your seed here</span>
+)</div>
+    </div>
+
+    <div style="margin-top:12px">
+      <div class="tip tip-good">
+        <div class="tip-icon">✓</div>
+        <div class="tip-text"><strong>Tip:</strong> For <em>C. acnes</em> MDR phage design, seed with the large terminase subunit from PAC1 or phiSA039-type sequences. The model trained on curated phage sequences from IMG/VR and can extrapolate novel capsid/tail architectures.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Code examples -->
+  <div class="section-label">04 &nbsp; ready-to-run code</div>
+
+  <div class="card grid-fullwidth" style="padding: 0; overflow: hidden;">
+    <div class="tab-bar" style="padding: 0 16px; margin-top: 0;">
+      <div class="tab active" onclick="switchTab('python')">Python</div>
+      <div class="tab" onclick="switchTab('curl')">cURL</div>
+      <div class="tab" onclick="switchTab('batch')">Batch generation</div>
+      <div class="tab" onclick="switchTab('scoring')">Sequence scoring</div>
+    </div>
+
+    <div class="tab-code-wrapper">
+
+      <!-- Python -->
+      <div id="tab-python" class="tab-panel active">
+        <div class="code-block"><span class="c-kw">import</span> requests, os, json
+<span class="c-kw">from</span> pathlib <span class="c-kw">import</span> Path
+
+<span class="c-key">API_KEY</span> = os.environ[<span class="c-str">"NVIDIA_API_KEY"</span>]
+<span class="c-key">URL</span>     = <span class="c-str">"https://health.api.nvidia.com/v1/biology/arc/evo2-40b/generate"</span>
+
+<span class="c-cmt"># --- seed: first 500 bp of a reference C. acnes phage terminase ---</span>
+<span class="c-key">SEED</span> = (
+    <span class="c-str">"|k__Viruses;p__Uroviricota;c__Caudoviricetes;"</span>
+    <span class="c-str">"o__Caudovirales;g__Pahexavirus;s__Propionibacterium_phage_PA6|"</span>
+    <span class="c-str">"ATGAAAGCAATTTTCGTACTGAAAGGTTTTGTT"</span>   <span class="c-cmt"># truncated for readability</span>
+)
+
+<span class="c-key">payload</span> = {
+    <span class="c-str">"sequence"</span>:             SEED,
+    <span class="c-str">"num_tokens"</span>:           <span class="c-num">30000</span>,    <span class="c-cmt"># ~30 kb novel sequence</span>
+    <span class="c-str">"temperature"</span>:          <span class="c-num">0.85</span>,
+    <span class="c-str">"top_k"</span>:                <span class="c-num">4</span>,
+    <span class="c-str">"enable_sampled_probs"</span>: <span class="c-kw">True</span>,
+}
+
+<span class="c-key">r</span> = requests.<span class="c-fn">post</span>(
+    URL,
+    headers={<span class="c-str">"Authorization"</span>: <span class="c-fn">f</span><span class="c-str">"Bearer {API_KEY}"</span>},
+    json=payload,
+    timeout=<span class="c-num">300</span>,
+)
+
+<span class="c-kw">if</span> <span class="c-str">"application/json"</span> <span class="c-kw">in</span> r.headers.get(<span class="c-str">"Content-Type"</span>, <span class="c-str">""</span>):
+    <span class="c-key">result</span> = r.<span class="c-fn">json</span>()
+    <span class="c-key">seq</span>    = result[<span class="c-str">"sequence"</span>]
+    <span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"Generated {len(seq)} bp"</span>)
+    Path(<span class="c-str">"phage_candidate_001.fasta"</span>).<span class="c-fn">write_text</span>(
+        <span class="c-fn">f</span><span class="c-str">">evo2_phage_candidate_001\n{seq}\n"</span>
+    )
+<span class="c-kw">elif</span> <span class="c-str">"application/zip"</span> <span class="c-kw">in</span> r.headers.get(<span class="c-str">"Content-Type"</span>, <span class="c-str">""</span>):
+    Path(<span class="c-str">"output.zip"</span>).<span class="c-fn">write_bytes</span>(r.content)
+    <span class="c-fn">print</span>(<span class="c-str">"Large response saved to output.zip"</span>)</div>
+      </div>
+
+      <!-- cURL -->
+      <div id="tab-curl" class="tab-panel">
+        <div class="code-block"><span class="c-fn">curl</span> -X POST \
+  <span class="c-url">https://health.api.nvidia.com/v1/biology/arc/evo2-40b/generate</span> \
+  -H <span class="c-str">"Authorization: Bearer $NVIDIA_API_KEY"</span> \
+  -H <span class="c-str">"Content-Type: application/json"</span> \
+  -d <span class="c-str">'{
+    "sequence":             "ATGAAAGCAATTTTCGTACTGAA",
+    "num_tokens":           5000,
+    "temperature":          0.85,
+    "top_k":                4,
+    "enable_sampled_probs": true
+  }'</span> \
+  -o phage_output.json</div>
+      </div>
+
+      <!-- Batch -->
+      <div id="tab-batch" class="tab-panel">
+        <div class="code-block"><span class="c-kw">import</span> requests, os, time
+<span class="c-kw">from</span> pathlib <span class="c-kw">import</span> Path
+
+<span class="c-key">API_KEY</span> = os.environ[<span class="c-str">"NVIDIA_API_KEY"</span>]
+<span class="c-key">URL</span>     = <span class="c-str">"https://health.api.nvidia.com/v1/biology/arc/evo2-40b/generate"</span>
+
+<span class="c-cmt"># Multiple seeds: e.g. terminase, capsid, tail fiber regions</span>
+<span class="c-key">SEEDS</span> = [
+    (<span class="c-str">"terminase"</span>,   <span class="c-str">"ATGAAAGCAATTTTCGTACTGAA..."</span>),
+    (<span class="c-str">"capsid"</span>,      <span class="c-str">"ATGGCTAGCGAAGTTCCGAATAT..."</span>),
+    (<span class="c-str">"tail_fiber"</span>,  <span class="c-str">"ATGCGTAACGATAAAGCCCAAGG..."</span>),
+]
+
+<span class="c-key">out</span> = Path(<span class="c-str">"phage_candidates"</span>)
+out.<span class="c-fn">mkdir</span>(exist_ok=<span class="c-kw">True</span>)
+
+<span class="c-kw">for</span> name, seed <span class="c-kw">in</span> SEEDS:
+    <span class="c-key">r</span> = requests.<span class="c-fn">post</span>(
+        URL,
+        headers={<span class="c-str">"Authorization"</span>: <span class="c-fn">f</span><span class="c-str">"Bearer {API_KEY}"</span>},
+        json={<span class="c-str">"sequence"</span>: seed, <span class="c-str">"num_tokens"</span>: <span class="c-num">10000</span>,
+              <span class="c-str">"temperature"</span>: <span class="c-num">0.85</span>, <span class="c-str">"top_k"</span>: <span class="c-num">4</span>},
+        timeout=<span class="c-num">300</span>,
+    )
+    <span class="c-key">seq</span> = r.<span class="c-fn">json</span>()[<span class="c-str">"sequence"</span>]
+    (out / <span class="c-fn">f</span><span class="c-str">"{name}.fasta"</span>).<span class="c-fn">write_text</span>(
+        <span class="c-fn">f</span><span class="c-str">">evo2_{name}\n{seq}\n"</span>
+    )
+    <span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"{name}: {len(seq)} bp"</span>)
+    time.<span class="c-fn">sleep</span>(<span class="c-num">2</span>)   <span class="c-cmt"># rate limit courtesy</span></div>
+      </div>
+
+      <!-- Scoring -->
+      <div id="tab-scoring" class="tab-panel">
+        <div class="code-block"><span class="c-cmt"># Score a known phage sequence to assess model log-likelihood
+# Useful for: variant effect prediction, comparing candidate genomes</span>
+
+<span class="c-kw">import</span> requests, os, numpy <span class="c-kw">as</span> np
+
+<span class="c-key">API_KEY</span> = os.environ[<span class="c-str">"NVIDIA_API_KEY"</span>]
+<span class="c-key">URL</span>     = <span class="c-str">"https://health.api.nvidia.com/v1/biology/arc/evo2-40b/generate"</span>
+
+<span class="c-kw">def</span> <span class="c-fn">score_sequence</span>(seq: str) -> float:
+    <span class="c-str">"""Return mean log-probability across all positions."""</span>
+    <span class="c-key">r</span> = requests.<span class="c-fn">post</span>(
+        URL,
+        headers={<span class="c-str">"Authorization"</span>: <span class="c-fn">f</span><span class="c-str">"Bearer {API_KEY}"</span>},
+        json={
+            <span class="c-str">"sequence"</span>:             seq[:<span class="c-num">-1</span>],   <span class="c-cmt"># seed = all but last nt</span>
+            <span class="c-str">"num_tokens"</span>:           <span class="c-num">1</span>,
+            <span class="c-str">"temperature"</span>:          <span class="c-num">1.0</span>,
+            <span class="c-str">"top_k"</span>:                <span class="c-num">1</span>,
+            <span class="c-str">"enable_sampled_probs"</span>: <span class="c-kw">True</span>,
+        },
+        timeout=<span class="c-num">120</span>,
+    )
+    <span class="c-key">probs</span> = r.<span class="c-fn">json</span>().<span class="c-fn">get</span>(<span class="c-str">"sampled_probs"</span>, [])
+    <span class="c-kw">return</span> float(np.<span class="c-fn">mean</span>(np.<span class="c-fn">log</span>(probs))) <span class="c-kw">if</span> probs <span class="c-kw">else</span> <span class="c-kw">None</span>
+
+<span class="c-cmt"># Compare WT vs SNP at position 847 (e.g. essential lysin residue)</span>
+wt_score  = <span class="c-fn">score_sequence</span>(wt_sequence)
+snp_score = <span class="c-fn">score_sequence</span>(snp_sequence)
+<span class="c-fn">print</span>(<span class="c-fn">f</span><span class="c-str">"ΔlogP (SNP - WT): {snp_score - wt_score:.4f}"</span>)</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Section: Workflow -->
+  <div class="section-label">05 &nbsp; recommended workflow</div>
+
+  <div class="card grid-fullwidth">
+    <div class="card-title ct-teal">From seed to synthesis-ready candidate</div>
+    <div class="workflow">
+      <div class="wf-step">
+        <div class="wf-icon">🧬</div>
+        <div class="wf-label">Seed prep</div>
+        <div class="wf-desc">Pull 500 bp from reference phage (NCBI/PATRIC). Add taxonomy tag.</div>
+      </div>
+      <div class="wf-arrow">›</div>
+      <div class="wf-step">
+        <div class="wf-icon">⚡</div>
+        <div class="wf-label">Generate</div>
+        <div class="wf-desc">Call API. Temperature 0.85, top_k 4. Generate 3–5 candidates per seed.</div>
+      </div>
+      <div class="wf-arrow">›</div>
+      <div class="wf-step">
+        <div class="wf-icon">🔍</div>
+        <div class="wf-label">QC filter</div>
+        <div class="wf-desc">GC% check, ORF prediction (Prokka/Pharokka), BLASTn vs. known phages.</div>
+      </div>
+      <div class="wf-arrow">›</div>
+      <div class="wf-step">
+        <div class="wf-icon">📊</div>
+        <div class="wf-label">Score</div>
+        <div class="wf-desc">Rank candidates by mean log-prob. Discard low-probability outliers.</div>
+      </div>
+      <div class="wf-arrow">›</div>
+      <div class="wf-step">
+        <div class="wf-icon">🧪</div>
+        <div class="wf-label">Synthesize</div>
+        <div class="wf-desc">Order top candidates via Twist or IDT. Assemble by Gibson or ARCA.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: QC checklist -->
+  <div class="section-label">06 &nbsp; post-generation QC checklist</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-green">Sequence-level checks</div>
+      <ul class="checklist">
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>GC content:</strong> phage genomes typically 35–65%; outliers suggest generation artifacts</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>ORF density:</strong> run <code>Pharokka</code> or <code>PHANOTATE</code>; expect ≥80% of genome in coding regions</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>Codon usage bias:</strong> compare to host (<em>C. acnes</em>) with <code>cusp</code> from EMBOSS</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>No homopolymer runs:</strong> flag runs &gt;8 nt (synthesis difficulty)</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>Repeat elements:</strong> check for direct/inverted repeats &gt;20 bp with <code>Repeat Finder</code></div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-amber">Functional annotation checks</div>
+      <ul class="checklist">
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>Structural proteins present:</strong> terminase large subunit, capsid, tail fiber/spike</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>Lytic machinery:</strong> endolysin + holin (or spanin for Gram-negative host)</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>No lysogeny genes:</strong> confirm absence of integrase/repressor for obligate lytic design</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>BLASTn vs NCBI phage db:</strong> confirm novelty &lt;95% identity over &gt;50% coverage</div>
+        </li>
+        <li>
+          <span class="check">☐</span>
+          <div class="check-label"><strong>No AMR genes:</strong> screen against CARD/ResFinder before any in vivo use</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Section: Tips -->
+  <div class="section-label">07 &nbsp; tips &amp; gotchas</div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title ct-teal">For better phage outputs</div>
+      <div class="tip tip-good">
+        <div class="tip-icon">✓</div>
+        <div class="tip-text"><strong>Use a functional seed, not random sequence.</strong> Start from a real phage gene — Evo 2 performs best when continuing biologically plausible context.</div>
+      </div>
+      <div class="tip tip-good">
+        <div class="tip-icon">✓</div>
+        <div class="tip-text"><strong>Generate multiple candidates per seed.</strong> Run 5–10 generations with different random seeds (vary temperature slightly) and select the best by log-prob score.</div>
+      </div>
+      <div class="tip tip-good">
+        <div class="tip-icon">✓</div>
+        <div class="tip-text"><strong>Use the Microviridae fine-tuned model</strong> (<code>evo2_7b_microviridae</code> via local install) if working with ssDNA phage — it may outperform the 40B base model on that specific clade.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-red">Common pitfalls</div>
+      <div class="tip tip-warn">
+        <div class="tip-icon">⚠</div>
+        <div class="tip-text"><strong>Token ≠ codon:</strong> 1 token = 1 nucleotide. A 30 kb genome requires <code>num_tokens: 29500</code> if seeding with 500 bp. Do not confuse with LLM token counts.</div>
+      </div>
+      <div class="tip tip-warn">
+        <div class="tip-icon">⚠</div>
+        <div class="tip-text"><strong>Large response handling:</strong> sequences &gt;~200 tokens return <code>application/zip</code>, not JSON. Always check <code>Content-Type</code> before parsing.</div>
+      </div>
+      <div class="tip tip-warn">
+        <div class="tip-icon">⚠</div>
+        <div class="tip-text"><strong>Free tier rate limits:</strong> add <code>time.sleep(2)</code> between batch calls. For production pipelines, upgrade to a paid NGC plan.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Downstream tools -->
+  <div class="section-label">08 &nbsp; downstream tools</div>
+
+  <div class="grid-3">
+    <div class="card">
+      <div class="card-title ct-green">Annotation</div>
+      <ul class="checklist">
+        <li><span class="check">→</span><div class="check-label"><strong>Pharokka</strong> — phage-specific annotation pipeline</div></li>
+        <li><span class="check">→</span><div class="check-label"><strong>PHANOTATE</strong> — phage ORF caller</div></li>
+        <li><span class="check">→</span><div class="check-label"><strong>PHASTER</strong> — web-based phage annotation</div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title ct-amber">Assembly / cloning</div>
+      <ul class="checklist">
+        <li><span class="check">→</span><div class="check-label"><strong>Gibson Assembly</strong> — for &lt;50 kb synthetic phage</div></li>
+        <li><span class="check">→</span><div class="check-label"><strong>Twist Bioscience</strong> — gene synthesis up to 50 kb</div></li>
+        <li><span class="check">→</span><div class="check-label"><strong>ARCA Biopharma</strong> — phage-specific synthesis</div></li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title ct-teal">Structure / docking</div>
+      <ul class="checklist">
+        <li><span class="check">→</span><div class="check-label"><strong>AlphaFold3</strong> — predict capsid protein structure</div></li>
+        <li><span class="check">→</span><div class="check-label"><strong>ESMFold (NVIDIA NIM)</strong> — fast structure prediction</div></li>
+        <li><span class="check">→</span><div class="check-label"><strong>DiffDock (NVIDIA NIM)</strong> — receptor binding prediction</div></li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <span>Evo 2 · Arc Institute · <a href="https://github.com/ArcInstitute/evo2" target="_blank">github.com/ArcInstitute/evo2</a></span>
+    <span>API docs: <a href="https://docs.api.nvidia.com/nim/reference/arc-evo2-40b" target="_blank">docs.api.nvidia.com</a> · Trained on OpenGenome2 (8.8T nucleotides)</span>
+    <span>Generated March 2026</span>
+  </footer>
+
+</div>
+
+<script>
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
